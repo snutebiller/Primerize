@@ -167,7 +167,7 @@ class Primerize_3D(Singleton):
         if len(primer_set) % 2:
             raise ValueError('\033[41mERROR\033[0m: Illegal length \033[95m%s\033[0m of value for params \033[92mprimer_set\033[0m for \033[94m%s.design()\033[0m.\n' % (len(primer_set), self.__class__))
         num_str = len(structures)
-        structures = filter(lambda x: len(x) == len(sequence), structures)
+        structures = list(filter(lambda x: len(x) == len(sequence), structures))
         if len(structures) != num_str:
             print('\033[93mWARNING\033[0m: Mismatch length of input \033[92mstructures\033[0m to \033[92msequence\033[0m for \033[94m%s.design()\033[0m.\n' % self.__class__)
         if not structures:
@@ -180,7 +180,7 @@ class Primerize_3D(Singleton):
         data = {'plates': [], 'assembly': [], 'constructs': [], 'bps': []}
 
         is_success = True
-        primer_set = map(util.RNA2DNA, primer_set)
+        primer_set = list(map(util.RNA2DNA, primer_set))
         if not primer_set:
             if is_force:
                 prm = Primerize_1D()
@@ -200,7 +200,7 @@ class Primerize_3D(Singleton):
         if not which_muts:
             which_muts = list(range(1 - offset, N_BP + 1 - offset))
         else:
-            which_muts = filter(lambda x: (x >= 1 - offset and x < N_BP + 1 - offset), which_muts)
+            which_muts = list(filter(lambda x: (x >= 1 - offset and x < N_BP + 1 - offset), which_muts))
         which_lib = which_lib[0] if isinstance(which_lib, list) else which_lib
         N_primers = len(primer_set)
         params.update({'which_muts': which_muts, 'which_lib': which_lib, 'N_PRIMER': N_primers})
@@ -217,21 +217,21 @@ class Primerize_3D(Singleton):
 
         is_exclude = is_exclude if len(structures) > 1 else False
         bps = util.diff_bps(structures, flag=is_exclude)
-        bps = [filter(lambda xy: (xy[0] - offset in which_muts and xy[1] - offset in which_muts), helix) for helix in bps]
-        bps = filter(len, bps)
+        bps = [list(filter(lambda xy: (xy[0] - offset in which_muts and xy[1] - offset in which_muts), helix)) for helix in bps]
+        bps = list(filter(len, bps))
         if not bps:
             print('\033[41mFAIL\033[0m: \033[91mNo\033[0m base-pairs exist within given \033[92mstructures\033[0m and \033[92mwhich_muts\033[0m.\n')
             return Design_Plate({'sequence': sequence, 'name': name, 'is_success': False, 'primer_set': primer_set, 'structures': structures, 'params': params, 'data': data})
 
         N_constructs = (sum(map(len, bps)) - N_mutations + 1) * (is_single * 2 + 1) + 1
         N_plates = int(math.floor((N_constructs - 1) / 96.0) + 1)
-        plates = [[util_class.Plate_96Well(which_lib) for i in xrange(N_plates)] for j in xrange(N_primers)]
+        plates = [[util_class.Plate_96Well(which_lib) for i in range(N_plates)] for j in range(N_primers)]
 
         for helix in bps:
-            for i in xrange(len(helix) - N_mutations + 1):
+            for i in range(len(helix) - N_mutations + 1):
                 (mut_list_l, mut_list_r) = ([], [])
 
-                for j in xrange(N_mutations):
+                for j in range(N_mutations):
                     (nt_1, nt_2) = (sequence[helix[i + j][0] - 1], sequence[helix[i + j][1] - 1])
                     if nt_1 == 'G' and nt_2 == 'T':
                         mut_list_l.append('G%dC' % (helix[i + j][0] - offset))

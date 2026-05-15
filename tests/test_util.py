@@ -7,7 +7,7 @@ import unittest
 class TestUtilFunc(unittest.TestCase):
 
     def test_mut_range(self):
-        self.assertListEqual(which_muts, range(102, 261 + 1))
+        self.assertListEqual(which_muts, list(range(102, 261 + 1)))
 
     def test_bps(self):
         self.assertListEqual(primerize.util.diff_bps('.....(((((.....))))).....'), [[(6, 20), (7, 19), (8, 18), (9, 17), (10, 16)]])

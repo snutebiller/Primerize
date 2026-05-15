@@ -39,7 +39,7 @@ class Assembly(object):
         (self.bp_lines, self.seq_lines, self.print_lines, self.Tm_overlaps) = util_server._draw_assembly(self.sequence, self.primers, COL_SIZE)
 
         self.primer_set = []
-        for i in xrange(self.primers.shape[1]):
+        for i in range(self.primers.shape[1]):
             primer_seq = self.sequence[self.primers[0, i]:self.primers[1, i] + 1]
             if self.primers[2, i] == -1:
                 self.primer_set.append(util.reverse_complement(primer_seq))
@@ -244,8 +244,8 @@ class Plate_96Well(object):
         ax = pyplot.subplot(111)
         ax.set_aspect('equal')
         pyplot.axis([0, 13.875, 0, 9.375])
-        pyplot.xticks([x * 1.125 + 0.75 for x in xrange(12)], [str(x + 1) for x in xrange(12)], fontsize=14)
-        pyplot.yticks([y * 1.125 + 0.75 for y in xrange(8)], list('ABCDEFGH'), fontsize=14)
+        pyplot.xticks([x * 1.125 + 0.75 for x in range(12)], [str(x + 1) for x in range(12)], fontsize=14)
+        pyplot.yticks([y * 1.125 + 0.75 for y in range(8)], list('ABCDEFGH'), fontsize=14)
         fig.suptitle(title, fontsize=16, fontweight='bold')
 
         for edge in ('bottom', 'top', 'left', 'right'):
@@ -258,8 +258,8 @@ class Plate_96Well(object):
             tic.tick1On = tic.tick2On = False
 
         (x_green, x_violet, x_gray, y_green, y_violet, y_gray) = ([], [], [], [], [], [])
-        for i in xrange(8):
-            for j in xrange(12):
+        for i in range(8):
+            for j in range(12):
                 num = i + j * 8 + 1
                 if util.num_to_coord(num) in self.coords:
                     tag = self._data[num][0]
@@ -327,7 +327,7 @@ class Mutation(object):
         """Comparison method for whether two ``Mutation`` objects contain the same set of mutations.
         """
 
-        if isinstance(other, (str, unicode)) and other == 'WT': return len(self) == 0
+        if isinstance(other, str) and other == 'WT': return len(self) == 0
         if isinstance(other, Mutation): other = other.list()
         return other in self and len(self) == len(other)
 
@@ -348,7 +348,7 @@ class Mutation(object):
             ``bool``
         """
 
-        if isinstance(mut_str, (str, unicode)): mut_str = [mut_str]
+        if isinstance(mut_str, str): mut_str = [mut_str]
         if not (mut_str or self._data): return True
         flag = False
 
@@ -373,7 +373,7 @@ class Mutation(object):
             ValueError: For illegal **mut_str**.
         """
 
-        if isinstance(mut_str, (str, unicode)): mut_str = [mut_str]
+        if isinstance(mut_str, str): mut_str = [mut_str]
         for mut in mut_str:
             if mut == 'WT': continue
 
@@ -395,7 +395,7 @@ class Mutation(object):
             ``bool``: Whether all mutations in **mut_list** are successfully removed.
         """
 
-        if isinstance(mut_str, (str, unicode)): mut_str = [mut_str]
+        if isinstance(mut_str, str): mut_str = [mut_str]
         for mut in mut_str:
             if mut in self:
                 seq_pos = int(mut[1:-1])
@@ -428,7 +428,7 @@ class Mutation(object):
             ``list(str)``
         """
 
-        return map(lambda x: '%s%s%s' % (self._data[x][0], x, self._data[x][1]), sorted(self._data.keys()))
+        return list(map(lambda x: '%s%s%s' % (self._data[x][0], x, self._data[x][1]), sorted(self._data.keys())))
 
 
     def echo(self):
@@ -488,7 +488,7 @@ class Construct_List(object):
         """Iterator through all constructs.
         """
 
-        for i in xrange(len(self._data)):
+        for i in range(len(self._data)):
             yield self._data[i]
 
     def __contains__(self, mut_list):

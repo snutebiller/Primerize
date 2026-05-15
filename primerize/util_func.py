@@ -26,7 +26,7 @@ def _get_primer_index(primer_set, sequence):
     coverage = numpy.zeros((1, len(sequence)))
     primers = numpy.zeros((3, N_primers))
 
-    for n in xrange(N_primers):
+    for n in range(N_primers):
         primer = util.RNA2DNA(primer_set[n])
         if n % 2:
             i = sequence.find(util.reverse_complement(primer))
@@ -81,8 +81,8 @@ def _print_pair_mismatch_warning(sequence, warnings, offset):
 
 
 def _save_plate_layout(plates, ref_primer=[], prefix='', path='./'):
-    for k in xrange(len(plates[0])):
-        for p in xrange(len(plates)):
+    for k in range(len(plates[0])):
+        for p in range(len(plates)):
             primer_sequences = plates[p][k]
             num_primers_on_plate = len(primer_sequences)
 
@@ -116,12 +116,12 @@ def _save_structures(structures, warnings, sequence, offset, name, path='./'):
 
 
 def _save_plates_excel(plates, ref_primer=[], prefix='', path='./'):
-    for k in xrange(len(plates[0])):
+    for k in range(len(plates[0])):
         file_name = os.path.join(path, '%s_plate_%d.xls' % (prefix, k + 1))
         print('Creating plate file: \033[94m%s\033[0m.' % file_name)
         workbook = xlwt.Workbook()
 
-        for p in xrange(len(plates)):
+        for p in range(len(plates)):
             primer_sequences = plates[p][k]
             num_primers_on_plate = len(primer_sequences)
 
@@ -164,7 +164,7 @@ def _mutate_primers(plates, primers, primer_set, offset, constructs, which_lib=1
         # keep track of unmatched mutations
         is_valid = mut.list()
 
-        for p in xrange(len(primer_set)):
+        for p in range(len(primer_set)):
             wt_primer = primer_set[p]
             if mut == 'WT':
                 well_name = 'Lib%d-%s' % (which_lib, 'WT')

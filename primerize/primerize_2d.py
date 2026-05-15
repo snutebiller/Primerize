@@ -144,7 +144,7 @@ class Primerize_2D(Singleton):
         data = {'plates': [], 'assembly': [], 'constructs': []}
 
         is_success = True
-        primer_set = map(util.RNA2DNA, primer_set)
+        primer_set = list(map(util.RNA2DNA, primer_set))
         if not primer_set:
             if is_force:
                 prm = Primerize_1D()
@@ -164,7 +164,7 @@ class Primerize_2D(Singleton):
         if not which_muts:
             which_muts = list(range(1 - offset, N_BP + 1 - offset))
         else:
-            which_muts = filter(lambda x: (x >= 1 - offset and x < N_BP + 1 - offset), which_muts)
+            which_muts = list(filter(lambda x: (x >= 1 - offset and x < N_BP + 1 - offset), which_muts))
         which_lib = which_lib[0] if isinstance(which_lib, list) else which_lib
 
         N_primers = len(primer_set)
@@ -179,11 +179,11 @@ class Primerize_2D(Singleton):
 
         assembly = util_class.Assembly(sequence, primers, name, self.COL_SIZE)
         constructs = util_class.Construct_List()
-        plates = [[util_class.Plate_96Well(which_lib) for i in xrange(N_plates)] for j in xrange(N_primers)]
+        plates = [[util_class.Plate_96Well(which_lib) for i in range(N_plates)] for j in range(N_primers)]
         print('Filling out sequences ...')
 
         try:
-            for m_pos in xrange(-1, len(which_muts)):
+            for m_pos in range(-1, len(which_muts)):
                 # m is actual position along sequence
                 m = -1 if m_pos == -1 else offset + which_muts[m_pos] - 1
                 if m != -1:

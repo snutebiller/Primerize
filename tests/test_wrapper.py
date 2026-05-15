@@ -20,7 +20,7 @@ class TestDesignSingle(unittest.TestCase):
         print(repr(self.job_1d))
 
     def test_get(self):
-        self.assertEqual(map(lambda x: list(x), self.job_1d.get('WARNING')), OUTPUT['1D']['warning'])
+        self.assertEqual(list(map(lambda x: list(x), self.job_1d.get('WARNING'))), OUTPUT['1D']['warning'])
         self.assertListEqual(self.job_1d.get('MISPRIME'), OUTPUT['1D']['misprime'])
         self.assertEqual(self.job_1d.get('N_BP'), OUTPUT['1D']['param']['N_BP'])
         self.assertEqual(self.job_1d.get('MIN_TM'), OUTPUT['1D']['param']['MIN_TM'])

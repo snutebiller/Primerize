@@ -42,7 +42,7 @@ def complement(sequence):
 
     rc_dict = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C', 'U': 'A'}
     try:
-        sequence = map(lambda x: rc_dict[x], list(sequence))
+        sequence = list(map(lambda x: rc_dict[x], list(sequence)))
     except KeyError:
         raise ValueError('\033[41mERROR\033[0m: Illegal sequence value \033[95m%s\033[0m for \033[94mcomplement()\033[0m.\n' % sequence)
 
@@ -104,7 +104,7 @@ def num_to_coord(num):
         ``str`` or ``None`` if illegal input.
     """
 
-    if num < 1 or num > 96 or (not isinstance(num, int)): return None
+    if not isinstance(num, int) or num < 1 or num > 96: return None
     row = 'ABCDEFGH'[(num - 1) % 8]
     col = (num - 1) / 8 + 1
     return '%s%0*d' % (row, 2, col)
@@ -223,21 +223,21 @@ def diff_bps(structures, offset=0, flag=True):
         bps_all = ['%d@%d' % (bp[0], bp[1]) for helix in helix_all for bp in helix]
         if flag:
             # remove pairs that present in all structures
-            bps = filter(lambda x: (bps_all.count(x) < len(structures)), set(bps_all))
+            bps = list(filter(lambda x: (bps_all.count(x) < len(structures)), set(bps_all)))
         else:
             # remove repeats
             bps = set(bps_all)
         # convert back to tuple(int, int)
         bps = [(int(x[0]), int(x[1])) for x in map(lambda x: x.split('@'), bps)]
 
-        for i in xrange(len(helix_all)):
+        for i in range(len(helix_all)):
             helix = helix_all[i]
             # remove base-pairs that not made through
-            helix_all[i] = filter(lambda x: x in bps, helix)
+            helix_all[i] = list(filter(lambda x: x in bps, helix))
             # remove base-pairs in bps that are taken in helix_all
-            bps = filter(lambda x: x not in helix, bps)
+            bps = list(filter(lambda x: x not in helix, bps))
         # remove empty structure []
-        return filter(len, helix_all)
+        return list(filter(len, helix_all))
 
 
 def valid_WC_pair(nt_1, nt_2):

@@ -131,7 +131,7 @@ class Primerize_Custom(Singleton):
             print('\033[41mFAIL\033[0m: \033[91mIllegal\033[0m type of given \033[92mmut_list\033[0m. Should be \033[94mConstruct_List\033[0m.\n')
             return Design_Plate({'sequence': sequence, 'name': name, 'is_success': is_success, 'primer_set': primer_set, 'params': params, 'data': data})
 
-        primer_set = map(util.RNA2DNA, primer_set)
+        primer_set = list(map(util.RNA2DNA, primer_set))
         if not primer_set:
             if is_force:
                 prm = Primerize_1D()
@@ -162,7 +162,7 @@ class Primerize_Custom(Singleton):
         which_lib = 0
         N_constructs = len(constructs)
         N_plates = int(math.floor((N_constructs - 1) / 96.0) + 1)
-        plates = [[util_class.Plate_96Well(which_lib) for i in xrange(N_plates)] for j in xrange(N_primers)]
+        plates = [[util_class.Plate_96Well(which_lib) for i in range(N_plates)] for j in range(N_primers)]
 
         try:
             plates = util_func._mutate_primers(plates, primers, primer_set, offset, constructs, which_lib)

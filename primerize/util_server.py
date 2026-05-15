@@ -11,7 +11,7 @@ def _draw_assembly(sequence, primers, COL_SIZE):
     seq_lines = []
     Tms = []
 
-    for i in xrange(N_primers):
+    for i in range(N_primers):
         primer = primers[:, i]
         seq_line = list(' ' * max(len(sequence), COL_SIZE))
         (seg_start, seg_end, seg_dir) = primer
@@ -29,7 +29,7 @@ def _draw_assembly(sequence, primers, COL_SIZE):
                 offset = seg_end + 4
                 seq_line[offset:(offset + len(num_txt))] = num_txt
         else:
-            seq_line[seg_start: seg_end + 1] = map(util.reverse_complement, sequence[seg_start: seg_end + 1])
+            seq_line[seg_start: seg_end + 1] = list(map(util.reverse_complement, sequence[seg_start: seg_end + 1]))
 
             if (seg_start - 1 >= 0):
                 seq_line[seg_start - 1] = '-'
@@ -44,7 +44,7 @@ def _draw_assembly(sequence, primers, COL_SIZE):
         bp_line = list(' ' * max(len(sequence), COL_SIZE))
         overlap_seq = ''
         last_bp_pos = 1
-        for j in xrange(len(sequence)):
+        for j in range(len(sequence)):
             if (seq_line_prev[j] in 'ACGT' and seq_line[j] in 'ACGT'):
                 bp_line[j] = '|'
                 last_bp_pos = j
@@ -62,13 +62,13 @@ def _draw_assembly(sequence, primers, COL_SIZE):
         seq_line_prev = seq_line
 
     print_lines = []
-    for i in xrange(int(math.floor((len(sequence) - 1) / COL_SIZE)) + 1):
+    for i in range(int(math.floor((len(sequence) - 1) / COL_SIZE)) + 1):
         start_pos = COL_SIZE * i
         end_pos = min(COL_SIZE * (i + 1), len(sequence))
         out_line = sequence[start_pos:end_pos]
         print_lines.append(('~', out_line))
 
-        for j in xrange(len(seq_lines)):
+        for j in range(len(seq_lines)):
             if (len(bp_lines[j][end_pos:].replace(' ', '')) and ('|' not in bp_lines[j][end_pos:].replace(' ', '')) and (not len(bp_lines[j][:start_pos].replace(' ', '')))):
                 bp_line = bp_lines[j][start_pos:].rstrip()
             elif ('|' not in bp_lines[j][start_pos:end_pos]):
@@ -166,10 +166,10 @@ def _draw_str_region(sequence, structures, bps, warnings, params):
     bps = [bp for helix in bps for bp in helix]
     for structure in structures:
         this_bps = [bp for helix in util.str_to_bps(structure) for bp in helix]
-        this_bps = filter(lambda x: (x in bps), this_bps)
-        bps = filter(lambda x: (x not in this_bps), bps)
+        this_bps = list(filter(lambda x: (x in bps), this_bps))
+        bps = list(filter(lambda x: (x not in this_bps), bps))
         this_nts = [nt for bp in this_bps for nt in bp]
-        mismatch = filter(lambda x: (x in this_bps), warnings)
+        mismatch = list(filter(lambda x: (x in this_bps), warnings))
         this_mis = [nt for bp in mismatch for nt in bp]
 
         for i, nt in enumerate(structure):
