@@ -1,25 +1,35 @@
-# Primerize (NA_Thermo)
+# Primerize
 
 <img src="https://primerize.stanford.edu/site_media/images/logo_primerize.png" alt="Primerize Logo" width="200" align="right">
 
-**Primerize** (previously named **NA_thermo**), is an archive of *Python* and *MATLAB* scripts for primer design and nucleic acid thermodynamic scripts developed by the [Das Lab](https://daslab.stanford.edu/) at Stanford University for high-throughput RNA synthesis and design.
+**Primerize** is a Python package for PCR assembly primer design, developed by the [Das Lab](https://daslab.stanford.edu/) at Stanford University for high-throughput RNA synthesis.
 
-The algorithm designs *forward* (sense strand) and *reverse* (anti-sense strand) primers that minimize the total length, and therefore the total synthesis cost, of the oligonucleotides. Although developed independently, **Primerize** is a special case of the general ‘*Gapped Oligo Design*’ algorithm, optimizing the mispriming score and sequence span instead of *T<sub>m<sub>*.
+The algorithm designs *forward* (sense strand) and *reverse* (anti-sense strand) primers that minimize the total length, and therefore the total synthesis cost, of the oligonucleotides.
 
-An online user-friendly GUI is available as the [**Primerize Server**](https://primerize.stanford.edu/).
+| | |
+|---|---|
+| **Website** | https://primerize.stanford.edu/ |
+| **Protocol** | https://primerize.stanford.edu/protocol/ |
+| **Documentation** | https://ribokit.github.io/Primerize/ |
+| **Site repo** | https://github.com/DasLab/primerize.github.io |
+
+> **Note:** The interactive Primerize web server was decommissioned in May 2026. Use this Python package directly — see [Usage](#usage) below, or try the [Claude Code prompt](#use-with-claude-code-or-ai-assistants).
 
 ## Installation
 
-To install **Primerize**, simply:
 ```bash
-cd path/to/Primerize/
-python setup.py install
+pip install git+https://github.com/ribokit/Primerize.git
 ```
 
-For system-wide installation, you must have permissions and use with `sudo`.
+Or from a local clone:
+```bash
+git clone https://github.com/ribokit/Primerize.git
+cd Primerize
+pip install .
+```
 
-**Primerize** requires the following *Python* packages as dependencies, all of which can be installed through [`pip`](https://pip.pypa.io/).
-```json
+**Dependencies** (installed automatically via pip):
+```
 matplotlib >= 1.5.0
 numpy >= 1.10.1
 xlwt >= 1.0.0
@@ -27,120 +37,82 @@ xlwt >= 1.0.0
 
 #### Loop Optimization with `numba` _(Optional)_
 
-To speed up **Primerize** code, we take advantage of [`@jit`](http://numba.pydata.org/numba-doc/0.23.1/user/jit.html) decorator of [`numba`](http://numba.pydata.org/) on loop optimization. **This is totally optional.** Enabling such feature may speed up the run for up to _10x_.
-
-`numba` requires [`llvm`](http://llvm.org/), which can be installed through [`apt-get`](https://help.ubuntu.com/lts/serverguide/apt-get.html) on *Linux* or [`brew`](http://brew.sh/) on Mac *OSX*. It also requires `llvmlite`, which can be installed through `pip`. The compatibility between `numba`, `llvmlite`, and `llvm` needs to pay special attention to. The below specified `numba` and `llvmlite` versions have been tested to work with `llvm 3.6.2` on *Linux* machines.
-
-```json
-llvmlite == 0.8.0
-numba == 0.23.1
-```
-
-Or the following works with `llvm 3.7.1`.
-
-```json
-llvmlite == 0.12.1
-numba == 0.27.0
-```
-
-Newer version combinations may work, but we haven't test since.
+To speed up **Primerize** code, we take advantage of the [`@jit`](http://numba.pydata.org/numba-doc/0.23.1/user/jit.html) decorator of [`numba`](http://numba.pydata.org/) on loop optimization. **This is totally optional.** Enabling such feature may speed up the run for up to _10x_.
 
 #### Test
 
-To test if **Primerize** is functioning properly in local installation, run the *unit test* scripts:
+To test if **Primerize** is functioning properly, run the unit tests:
 
 ```bash
 cd path/to/Primerize/tests/
 python -m unittest discover
 ```
 
-All test cases should pass.
+All 42 test cases should pass.
 
+## Use with Claude Code or AI Assistants
+
+Paste this prompt into [Claude Code](https://claude.ai/code) or another AI coding assistant to design primers for your sequence:
+
+```
+Help me design PCR assembly primers for my RNA construct using the Primerize
+Python package (https://github.com/ribokit/Primerize).
+
+1. Install: pip install git+https://github.com/ribokit/Primerize.git
+2. Run:
+     import primerize
+     sequence = "PASTE_YOUR_SEQUENCE_HERE"  # RNA or DNA, any case
+     result = primerize.Primerize_1D.design(sequence)
+     if result.is_success:
+         print(result)
+         result.save()  # writes primer file with sequences for IDT ordering
+
+My sequence is: PASTE_YOUR_SEQUENCE_HERE
+```
 
 ## Usage
 
-For simple Primer Design tasks, follow this example:
+### 1D Primer Design (single construct)
 
 ```python
 import primerize
 
-prm_1d = primerize.Primerize_1D
-job_1d = prm_1d.design('TTCTAATACGACTCACTATAGGCCAAAGGCGUCGAGUAGACGCCAACAACGGAAUUGCGGGAAAGGGGUCAACAGCCGUUCAGUACCAAGUCUCAGGGGAAACUUUGAGAUGGCCUUGCAAAGGGUAUGGUAAUAAGCUGACGGACAUGGUCCUAACCACGCAGCCAAGUCCUAAGUCAACAGAUCUUCUGUUGAUAUGGAUGCAGUUCAAAACCAAACCGUCAGCGAGUAGCUGACAAAAAGAAACAACAACAACAAC', MIN_TM=60.0, NUM_PRIMERS=None, MIN_LENGTH=15, MAX_LENGTH=60, prefix='P4P6_2HP')
+sequence = 'TTCTAATACGACTCACTATAGGCCAAAGGCGUCGAGUAGACGCCAACAACGGAAUUGCGGGAAAGGGGUCAACAGCCGUUCAGUACCAAGUCUCAGGGGAAACUUUGAGAUGGCCUUGCAAAGGGUAUGGUAAUAAGCUGACGGACAUGGUCCUAACCACGCAGCCAAGUCCUAAGUCAACAGAUCUUCUGUUGAUAUGGAUGCAGUUCAAAACCAAACCGUCAGCGAGUAGCUGACAAAAAGAAACAACAACAACAAC'
+
+job_1d = primerize.Primerize_1D.design(sequence, MIN_TM=60.0, prefix='P4P6')
 if job_1d.is_success:
-	print job_1d
+    print(job_1d)
+    job_1d.save()   # writes P4P6.txt with primer sequences for IDT ordering
+```
 
-job_2d = primerize.Primerize_2D.design(job_1d, offset=-51, which_muts=range(102, 261 + 1), which_lib=1)
+### 2D Mutate-and-Map Library (96-well plates)
+
+```python
+job_2d = primerize.Primerize_2D.design(sequence, primer_set=job_1d['primer_set'],
+                                        offset=-51, which_lib=1, prefix='P4P6')
 if job_2d.is_success:
-	print job_2d
-	job_2d.save()
+    print(job_2d)
+    job_2d.save()   # writes .xls plate files (for IDT plate ordering) + .svg layout images
+```
 
-job_3d = primerize.Primerize_3D.design(job_1d, offset=-51, structures=['...........................((((((.....))))))...........((((((...((((((.....(((.((((.(((..(((((((((....)))))))))..((.......))....)))......)))))))....))))))..)).))))((...((((...(((((((((...)))))))))..))))...)).............((((((.....))))))......................'], N_mutations=1, which_lib=1, is_single=True, is_fillWT=True)
+### 3D Structure-Based Library
+
+```python
+structures = ['...........................((((((.....))))))...........((((((..((((((.....(((.((((.(((..(((((((((....)))))))))..((.......))....)))......)))))))....))))))..)).))))((... ((((...(((((((((...)))))))))..))))...)).............((((((.....))))))......................']
+job_3d = primerize.Primerize_3D.design(sequence, primer_set=job_1d['primer_set'],
+                                        offset=-51, structures=structures,
+                                        N_mutations=1, which_lib=1)
 if job_3d.is_success:
-    print job_3d
+    print(job_3d)
     job_3d.save()
 ```
 
-For advanced users, the returned `Design_Single` and `Design_Plate` result classes (refer to the [**Documentation**](https://ribokit.github.io/Primerize/primerize.wrapper)) offer methods for `get()`, `save()` and `echo()`:
-
-```python
-MIN_TM = job_1d.get('MIN_TM')
-print job_1d.get('MISPRIME')
-print job_1d.echo('WARNING')
-if job_1d.is_success:
-	job_1d.save(path='result/', name='Primer')
-
-LIB = job_2d.get('which_lib')
-N_PRIMER = job_2d.get('N_PRIMER')
-print job_2d.get('CONSTRUCT')
-if job_2d.is_success:
-	print job_2d.echo('region')
-	job_2d.save('assembly', path='result/', name='Lib')
-
-N_PLATE = job_3d.get('N_PLATE')
-if job_3d.is_success:
-    print job_3d.echo('plate')
-    print repr(job_3d)
-```
-
-Besides `design()`, the `Primerize_1D`, `Primerize_2D`, and `Primerize_3D` factory instances offer methods for `get()`, `set()`, and `reset()`:
-
-```python
-COL_SIZE = prm_1d.get('COL_SIZE')
-prm_1d.set('MIN_LENGTH', 30)
-prm_1d.reset()
-```
-
-There are also `Assembly`, `Mutation`, `Construct_List`, and `Plate_96Well` helper classes. For more details, please refer to the [**Documentation**](https://ribokit.github.io/Primerize/primerize.util).
-
-Additionally, you can specify your customized list of mutations through the `Primerize_Custom` factory instance:
-
-```python
-mut_list = primerize.util.Construct_List()
-mut_list.push(['T120C'])
-job_cm = primerize.Primerize_Custom.design(job_1d, offset=-51, mut_list=mut_list)
-```
-
-More importantly, you can use the `merge()` method of `Construct_List` to combine multiple results into one:
-
-```python
-mut_list = job_2d.get('CONSTRUCT')
-mut_list.merge(job_3d.get('CONSTRUCT'))
-job_cm = primerize.Primerize_Custom.design(job_1d, offset=-51, mut_list=mut_list)
-if job_cm.is_success:
-    print job_2d
-    job_2d.save()
-```
-
-
-#### MATLAB Code _(Deprecated)_
-
-Instructions on *MATLAB* usage is available at old [README.md](https://github.com/ribokit/Primerize/blob/master/MATLAB/README.md). Please note that *MATLAB* code is no longer actively under development or fully maintained.
+For advanced usage — `get()`, `save()`, `echo()`, custom mutation lists — see the [Documentation](https://ribokit.github.io/Primerize/).
 
 ## Documentation
 
-Code Documentation is available at https://ribokit.github.io/Primerize/ or https://primerize.stanford.edu/docs/.
-
-Experimental Protocol is available at https://primerize.stanford.edu/protocol/.
+- Full docs: https://ribokit.github.io/Primerize/
+- Protocol: https://primerize.stanford.edu/protocol/
 
 ## License
 
@@ -158,6 +130,4 @@ Copyright &copy; of **Primerize** _Source Code_ is described in [LICENSE.md](htt
 
 <hr/>
 
-Developed by **Das lab**, _Leland Stanford Junior University_.
-
-README by [**t47**](https://t47.io/), *January 2016*.
+Developed by **Das Lab**, _Stanford University / HHMI_.
